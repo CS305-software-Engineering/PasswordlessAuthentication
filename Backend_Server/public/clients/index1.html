@@ -1,0 +1,45 @@
+<!-- Webpage for displaying QR Code  -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test QR Code</title>
+</head>
+
+<body>
+    <!-- <button onclick="sendMessage()">Send Msg</button> -->
+    <canvas id="canvas"></canvas>
+</body>
+<script src="/qrcode/qrcode.min.js"></script>
+<script>
+
+    // Create WebSocket connection.
+    const socket = new WebSocket('ws://localhost:3000');
+
+    // Connection opened
+    socket.addEventListener('open', function (event) {
+        console.log('Connected to WS Server')
+    });
+
+
+    // Listen for messages
+    socket.addEventListener('message', function (event) {
+        console.log('Message from server ', event.data);
+
+        //read the qr_id from server and generate qr_code
+        if (event.data.startsWith("xxxxx")) {
+            QRCode.toCanvas(document.getElementById('canvas'), event.data, function (error) {
+                if (error) console.error(error)
+                console.log('success!');
+            });
+        }
+    });
+
+    const sendMessage = () => {
+        socket.send('Hello From Client1!!');
+    }
+</script>
+
+</html>
