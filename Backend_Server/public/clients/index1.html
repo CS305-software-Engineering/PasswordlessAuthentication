@@ -12,7 +12,17 @@
     <!-- <button onclick="sendMessage()">Send Msg</button> -->
     <canvas id="canvas"></canvas>
 </body>
-<script src="/qrcode/qrcode.min.js"></script>
+<!-- <script src="/qrcode/qrcode.min.js"></script> -->
+<script>
+    var firebaseConfig = {
+            apiKey: '<your-api-key>',
+            authDomain: '<your-auth-domain>',
+            databaseURL: '<your-database-url>',
+            storageBucket: '<your-storage-bucket-url>'
+        };
+    firebase.initializeApp(firebaseConfig);
+    var storage = firebase.storage();
+</script>
 <script>
 
     // Create WebSocket connection.
