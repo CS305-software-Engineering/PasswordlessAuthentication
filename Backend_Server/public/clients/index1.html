@@ -5,42 +5,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test QR Code</title>
+    <meta http-equiv="refresh" content="30">
+    <title>AuthQR</title>
 </head>
 
-<body>
-    <!-- <button onclick="sendMessage()">Send Msg</button> -->
-    <canvas id="canvas"></canvas>
-</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="/qrcode/qrcode.min.js"></script>
-
 <script>
-
-    // Create WebSocket connection.
     const socket = new WebSocket('ws://localhost:3000');
+    //const socket = new WebSocket('wss://passwdless-auth.herokuapp.com/');
 
     // Connection opened
     socket.addEventListener('open', function (event) {
+        socket.send(JSON.stringify({ message: 'Connected to WS Server' }))
         console.log('Connected to WS Server')
     });
 
 
     // Listen for messages
     socket.addEventListener('message', function (event) {
-        console.log('Message from server ', event.data);
 
-        //read the qr_id from server and generate qr_code
-        if (event.data.startsWith("xxxxx")) {
-            QRCode.toCanvas(document.getElementById('canvas'), event.data, function (error) {
+        const server_msg = JSON.parse(event.data);
+        console.log('Message from server ' + event.data);
+        console.log('Message from server ' + JSON.parse(event.data).message);
+
+        //Generate QR code to display in web browser
+
+        if (server_msg.message == 'QR generation') {
+            console.log('QR id:   ' + server_msg.QR_Id);
+            QRCode.toCanvas(document.getElementById('canvas'), server_msg.QR_Id, function (error) {
                 if (error) console.error(error)
-                console.log('success!');
+                else { console.log('success!') };
             });
         }
+        if (server_msg.Auth == true) {
+            window.location = "http://localhost:3000/home.html?user=" + server_msg.username;
+            // Connectionwindow.location = "https://passwdless-auth.herokuapp.com/home.html?user=" + server_msg.username;
+        }
     });
-
-    const sendMessage = () => {
-        socket.send('Hello From Client1!!');
-    }
 </script>
+
+
+<body>
+    <h1>AuthQR Web Login</h1>
+    <canvas class="center" id="canvas"></canvas>
+</body>
 
 </html>

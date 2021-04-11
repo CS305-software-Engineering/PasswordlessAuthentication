@@ -1,0 +1,15 @@
+<h1>
+    <div>Welcome!!</div>
+</h1>
+<h1 id='user'> </h1>
+<script type="text/javascript">
+    var queryString = new Array();
+    window.onload = function () {
+
+        var parameters = location.search.substring(1).split("&");
+        var temp = parameters[0].split("=");
+        var name = unescape(temp[1]);
+        document.getElementById("user").innerHTML = name;
+
+    };
+</script>

@@ -3,28 +3,28 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-
-
+var bodyParser = require('body-parser');
 
 var app = express();
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+//app.set('views', path.join(__dirname, 'views'));
+//app.set('view engine', 'jade');
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+//app.set('views', path.join(__dirname, 'views'));
+//app.engine('html', require('ejs').renderFile);
+app.set('view engine', 'html');
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
 
-
+//Handling post request
+app.post('/login', function (req, res, next) {
+  console.log(req.body);
+  res.status(201).send('received post request' + JSON.stringify(req.body));
+})
 
 
 // catch 404 and forward to error handler
