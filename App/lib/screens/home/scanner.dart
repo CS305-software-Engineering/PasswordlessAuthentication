@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
@@ -27,6 +27,12 @@ class _ScannerState extends State<Scanner> {
       barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
           '#ff6666', 'Cancel', true, ScanMode.QR);
       print(barcodeScanRes);
+
+
+      var url = Uri.parse('https://passwdless-auth.herokuapp.com/login');
+      var response = await http.post(url, body: {'qr_id': barcodeScanRes ,'username': 'DFBFFSGG'});
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
     } on PlatformException {
       barcodeScanRes = 'Failed to get platform version.';
     }
