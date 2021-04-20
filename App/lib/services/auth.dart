@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:myapp/models/user.dart';
 
 import 'package:myapp/screens/home/home.dart';
+import 'package:myapp/screens/profile.dart';
+import 'package:myapp/services/database.dart';
 
 
 class AuthService{
@@ -90,6 +92,7 @@ class AuthService{
                         AuthResult result = await _auth.signInWithCredential(credential);
 
                         FirebaseUser user = result.user;
+                       // await DatabaseService(uid: user.uid).updateUserData('');
 
                         return _userFromFirebaseUser(user);
 

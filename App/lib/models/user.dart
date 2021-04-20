@@ -8,13 +8,11 @@ class User{
 
 }
 
-class UserData{
+class profileData {
 
   final String uid;
-  final String phone;
   final String name;
 
 
-  UserData({this.uid,this.phone,this.name});
-
+  profileData({this.uid,this.name});
 }
