@@ -2,14 +2,35 @@
     <div>Welcome!!</div>
 </h1>
 <h1 id='user'> </h1>
-<script type="text/javascript">
-    var queryString = new Array();
+<input type="button" value="Log out" onclick="logout()">
+<script>
     window.onload = function () {
 
         var parameters = location.search.substring(1).split("&");
         var temp = parameters[0].split("=");
-        var name = unescape(temp[1]);
-        document.getElementById("user").innerHTML = name;
+        var token = unescape(temp[1]);
+        data = JSON.parse(atob(token.split('.')[1]));
+        document.getElementById("user").innerHTML = data.username;
 
     };
+</script>
+<script>
+
+    function logout() {
+        var data;
+        var parameters = location.search.substring(1).split("&");
+        var temp = parameters[0].split("=");
+        var token = unescape(temp[1]);
+        data = JSON.parse(atob(token.split('.')[1]));
+        console.log('name on browser');
+        console.log(data.username);
+        var oReq = new XMLHttpRequest();
+
+        oReq.open("POST", "http://localhost:3000/logout");
+        oReq.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        oReq.send("username=" + data.username);
+        // oReq.send({ 'username': data.username });
+        window.location = "http://localhost:3000/clients/index1.html";
+    }
+
 </script>
