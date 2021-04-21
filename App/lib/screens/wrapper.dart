@@ -5,6 +5,7 @@ import 'package:myapp/screens/authenticate/authenticate.dart';
 
 import 'package:myapp/screens/home/home.dart';
 import 'package:myapp/screens/profile.dart';
+import 'package:myapp/screens/setup_pin.dart';
 import 'package:provider/provider.dart';
 
 class Wrapper extends StatelessWidget {

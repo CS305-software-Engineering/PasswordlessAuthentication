@@ -38,6 +38,7 @@ class Home extends StatelessWidget {
             style: TextStyle(color: Colors.white , fontWeight: FontWeight.w600 , fontSize: 15.0),
           ),
 
+         automaticallyImplyLeading: false,
           backgroundColor: Colors.lightBlue,
           elevation: 0.0,
           actions:<Widget> [

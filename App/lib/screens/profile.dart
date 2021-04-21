@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/models/user.dart';
 import 'package:myapp/screens/home/home.dart';
+import 'package:myapp/screens/setup_pin.dart';
+import 'package:myapp/screens/verify_pin.dart';
 import 'package:myapp/screens/wrapper.dart';
 import 'package:myapp/services/database.dart';
 import 'package:myapp/shared/constants.dart';
@@ -29,7 +31,7 @@ class _ProfileState extends State<Profile> {
 
     if(snapshot.hasData){
 
-      return Home();
+      return PinVerify();
 
     } else {
             profileData ProflieData = snapshot.data;
@@ -84,8 +86,8 @@ class _ProfileState extends State<Profile> {
                           );
                           //return Wrapper();
                           //Navigator.pop(context);
-                        //  Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
-                          return Home();
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => PinSetup()));
+                      //  return PinSetup();
 
                       }
                   ),
