@@ -30,6 +30,9 @@ class DatabaseService {
 
       return UserData(
         name: doc.data['name'] ?? '',
+        login_time: doc.data['Login Time'] ?? '',
+        logout_time: doc.data['Logout Time'] ?? '',
+        status: doc.data['Status'] ?? '',
       );
 
     }).toList();
@@ -39,7 +42,11 @@ class DatabaseService {
   profileData _profileDataFromSnapshot(DocumentSnapshot snapshot){
     return profileData(
       uid: uid,
-      name: snapshot.data['name']
+      name: snapshot.data['name'],
+        login_time: snapshot.data['Login Time'],
+      logout_time: snapshot.data['Logout Time'],
+      status: snapshot.data['Status']
+
     );
   }
 
