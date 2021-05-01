@@ -34,6 +34,11 @@ dependencies:
   flutter_spinkit: ^4.0.0
   restcountries: ^0.0.3
   flutter_barcode_scanner: ^1.0.2
+  pin_entry_text_field: ^0.1.4
+  firebase_core: ^0.4.0
+  firebase_messaging: ^4.0.0+1
+  http: ^0.12.0+1
+  shared_preferences:
 
 dev_dependencies:
   flutter_test:
