@@ -24,78 +24,58 @@
     <!-- Custom stylesheet -->
 </head>
 
-<h1>
-    <div>Welcome!!</div>
-</h1>
-<h1 id='user'> </h1>
-<input type="button" value="Log out" onclick="logout()">
 
+
+
+<!--..-->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="/qrcode/qrcode.min.js"></script>
 <script>
-    window.onload = function () {
+    const socket = new WebSocket('ws://localhost:3000');
+    //const socket = new WebSocket('wss://passwdless-auth.herokuapp.com/');
 
-        var parameters = location.search.substring(1).split("&");
-        var temp = parameters[0].split("=");
-        var token = unescape(temp[1]);
-        data = JSON.parse(atob(token.split('.')[1]));
-        document.getElementById("show_name").innerHTML = "Welcome " + data.username + ", you are logged in successfully!!!";
+    // Connection opened
+    socket.addEventListener('open', function (event) {
+        socket.send(JSON.stringify({ message: 'Connected to WS Server' }))
+        console.log('Connected to WS Server')
+    });
 
-    };
-</script>
-<script>
-    setInterval(function () {
-        var oReq = new XMLHttpRequest();
 
-        // oReq.open("POST", "http://localhost:3000/logout/check");
-        oReq.open("POST", "https://passwdless-auth.herokuapp.com/logout/check");
+    // Listen for messages
+    socket.addEventListener('message', function (event) {
 
-        oReq.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        oReq.responseType = 'json';
-        oReq.send("username=" + data.username);
-        // oReq.send({ 'username': data.username });
-        oReq.onload = function () {
-            let body = oReq.response;
-            console.log(body);
-            console.log("##");
-            console.log(body.msg);
-            if (body.msg == "Logged out") {
-                console.log('inside if');
-                //window.location = "http://localhost:3000/clients/index1.html";
-                window.location = "https://passwdless-auth.herokuapp.com/clients/index1.html";
-            }
-            else {
-                console.log('inside else');
+        const server_msg = JSON.parse(event.data);
+        console.log('Message from server ' + event.data);
+        console.log('Message from server ' + JSON.parse(event.data).message);
 
-            }
+        //Generate QR code to display in web browser
+
+        if (server_msg.message == 'QR generation') {
+            console.log('QR id:   ' + server_msg.QR_Id);
+            QRCode.toCanvas(document.getElementById('canvas'), server_msg.QR_Id, function (error) {
+                if (error) console.error(error)
+                else { console.log('success!') };
+            });
         }
+        if (server_msg.Auth == true) {
 
+            // var msg = JSON.parse(atob(server_msg.token.split('.')[1]));
+            window.location = "http://localhost:3000/home.html?user=" + server_msg.token;
+            //window.location = "https://passwdless-auth.herokuapp.com/home.html?user=" + server_msg.username;
+            // var str = " ";
+            // str += "<h1><div>Welcome!!</div></h1>";
+            // str += "<b>Name:</b>" + msg.username + "<br>";
+            // document.getElementById("start").innerHTML = " ";
+            // document.getElementById("profile").innerHTML = str;
 
-        //window.location = "http://localhost:3000/clients/index1.html";
-    }, 1000);
+        }
+    });
 </script>
 
-<script>
 
-    function logout() {
-        var data;
-        var parameters = location.search.substring(1).split("&");
-        var temp = parameters[0].split("=");
-        var token = unescape(temp[1]);
-        data = JSON.parse(atob(token.split('.')[1]));
-        console.log('name on browser');
-        console.log(data.username);
-        var oReq = new XMLHttpRequest();
 
-        //oReq.open("POST", "http://localhost:3000/logout");
-        oReq.open("POST", "https://passwdless-auth.herokuapp.com/logout");
-        oReq.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        oReq.send("username=" + data.username);
-        // oReq.send({ 'username': data.username });
-        //window.location = "http://localhost:3000/clients/index1.html";
-        window.location = "https://passwdless-auth.herokuapp.com/clients/index1.html";
-    }
 
-</script>
+
 
 <body data-theme="light" data-aos-easing="ease" data-aos-duration="400" data-aos-delay="0">
     <div class="site-wrapper overflow-hidden">
@@ -119,10 +99,10 @@
                         <div class="row">
                             <!-- hero area content start -->
                             <div class="col-lg-8 col-md-8 col-sm-10 pr-md-6 pr-sm-0">
-                                <p id="show_name"
+                                <p
                                     class="font-size-9 letter-spacing-np4 line-height-1p714 position-relative pr-xl-14 pr-lg-0 pr-md-9 pl-lg-11 pl-9">
-                                    <span class="pos-abs-tl px-1 h-50 bg-selago-2"></span>
-                                </p>
+                                    Scan the following QR code with the AuthQR app on your mobile to login <span
+                                        class="pos-abs-tl px-1 h-50 bg-selago-2"></span> </p>
                             </div>
                             <!-- hero area content end -->
                             <!-- btn start -->

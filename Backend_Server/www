@@ -17,6 +17,7 @@ var homeRouter = require('./routes/homeRouter');
 var loginRouter = require('./routes/loginRouter');
 var logoutRouter = require('./routes/logoutRouter');
 var refreshRouter = require('./routes/refreshTokenRouter');
+var msgRouter = require('./routes/msgRouter');
 
 
 const admin = require('firebase-admin');
@@ -45,6 +46,8 @@ app.use('/user', userRouter);
 app.use('/login', loginRouter);
 app.use('/logout', logoutRouter);
 app.use('/refresh', refreshRouter);
+app.use('/msg', msgRouter);
+
 
 
 // // catch 404 and forward to error handler
@@ -109,12 +112,15 @@ wss.on('connection', function connection(ws) {
       }
 
       sockets_connections[qr_id] = ws;
+      sockets_connections[qr_id].auth = false;  //new
       //sending the qr_id to the web browser to generate a QR Code
       ws.send(JSON.stringify(server_msg));
     }
 
 
   });
+
+
 
 });
 

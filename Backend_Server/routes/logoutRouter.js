@@ -17,11 +17,6 @@ logoutRouter.use(bodyParser.json());
 logoutRouter.route('/')
     .post(async (req, res) => {
         const data = req.body;
-        // const authHeader = req.headers.authorization;
-        // const token = authHeader.split(' ')[1];
-
-        // var data = jwt.decode(token);
-        // var userName = data['username'];
         console.log("name...");
         console.log(data);
         console.log('before');
@@ -68,6 +63,30 @@ logoutRouter.route('/')
             });
         res.send("Logout successful");
     });
+
+logoutRouter.route('/check')
+    .post(async (req, res) => {
+        const data = req.body;
+
+
+        console.log('name and refreshTokens check:  ');
+        var temp = data.username.toString();
+        console.log(temp);
+        console.log(refreshTokens[temp]);
+
+        if (refreshTokens[temp]) {
+            //res.send({ msg: "Logged in" });
+            res.send({ msg: "Logged in" });
+            console.log('inside 1');
+        }
+
+        else {
+            res.send({ msg: "Logged out" });
+            console.log('inside 2');
+
+        }
+    });
+
 
 
 module.exports = logoutRouter;

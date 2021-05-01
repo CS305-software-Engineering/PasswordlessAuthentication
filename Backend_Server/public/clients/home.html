@@ -24,11 +24,9 @@
     <!-- Custom stylesheet -->
 </head>
 
-<h1>
-    <div>Welcome!!</div>
-</h1>
-<h1 id='user'> </h1>
-<input type="button" value="Log out" onclick="logout()">
+
+
+
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script>
@@ -46,8 +44,8 @@
     setInterval(function () {
         var oReq = new XMLHttpRequest();
 
-        // oReq.open("POST", "http://localhost:3000/logout/check");
-        oReq.open("POST", "https://passwdless-auth.herokuapp.com/logout/check");
+        oReq.open("POST", "http://localhost:3000/logout/check");
+        //oReq.open("POST", "https://passwdless-auth.herokuapp.com/logout/check");
 
         oReq.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         oReq.responseType = 'json';
@@ -60,8 +58,8 @@
             console.log(body.msg);
             if (body.msg == "Logged out") {
                 console.log('inside if');
-                //window.location = "http://localhost:3000/clients/index1.html";
-                window.location = "https://passwdless-auth.herokuapp.com/clients/index1.html";
+                window.location = "http://localhost:3000/clients/index1.html";
+                //window.location = "https://passwdless-auth.herokuapp.com/clients/index1.html";
             }
             else {
                 console.log('inside else');
@@ -69,8 +67,6 @@
             }
         }
 
-
-        //window.location = "http://localhost:3000/clients/index1.html";
     }, 1000);
 </script>
 
@@ -86,13 +82,13 @@
         console.log(data.username);
         var oReq = new XMLHttpRequest();
 
-        //oReq.open("POST", "http://localhost:3000/logout");
-        oReq.open("POST", "https://passwdless-auth.herokuapp.com/logout");
+        oReq.open("POST", "http://localhost:3000/logout");
+        //oReq.open("POST", "https://passwdless-auth.herokuapp.com/logout");
         oReq.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         oReq.send("username=" + data.username);
         // oReq.send({ 'username': data.username });
-        //window.location = "http://localhost:3000/clients/index1.html";
-        window.location = "https://passwdless-auth.herokuapp.com/clients/index1.html";
+        window.location = "http://localhost:3000/clients/index1.html";
+        //window.location = "https://passwdless-auth.herokuapp.com/clients/index1.html";
     }
 
 </script>
@@ -123,6 +119,7 @@
                                     class="font-size-9 letter-spacing-np4 line-height-1p714 position-relative pr-xl-14 pr-lg-0 pr-md-9 pl-lg-11 pl-9">
                                     <span class="pos-abs-tl px-1 h-50 bg-selago-2"></span>
                                 </p>
+                                <input type="button" value="Log out" onclick="logout()">
                             </div>
                             <!-- hero area content end -->
                             <!-- btn start -->
