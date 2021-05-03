@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/models/user.dart';
 import 'package:myapp/screens/authenticate/authenticate.dart';
-
-
-import 'package:myapp/screens/home/home.dart';
+import 'package:myapp/screens/authenticate/sign_in.dart';
 import 'package:myapp/screens/profile.dart';
-import 'package:myapp/screens/setup_pin.dart';
 import 'package:provider/provider.dart';
 
 class Wrapper extends StatelessWidget {
@@ -20,7 +17,7 @@ class Wrapper extends StatelessWidget {
    // bool showSignIn = true;
 
     if(user == null){
-      return Authenticate();
+      return SignIn();
     } else {
       return Profile();
 

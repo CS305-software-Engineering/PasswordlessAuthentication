@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/screens/authenticate/enter_otp.dart';
 
-import 'package:myapp/screens/home/home.dart';
-import 'package:myapp/services/auth.dart';
-import 'package:myapp/shared/constants.dart';
-import 'package:myapp/shared/loading.dart';
+
+
 
 class SignIn extends StatefulWidget {
 
@@ -16,91 +15,127 @@ class _SignInState extends State<SignIn> {
 
 
 
-  final _phoneController = TextEditingController();
-  final _codeController = TextEditingController();
+  TextEditingController _controller = TextEditingController();
 
-  bool loading = false;
 
-  final AuthService _auth = AuthService();
-  final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
-    return loading ? Loading() : Scaffold(
-
-        resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.blueGrey,
-        appBar: AppBar(
-
-          title: Text(
-              '\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tUSER  LOGIN',
-            style: TextStyle(color: Colors.white , fontWeight: FontWeight.w600 , fontSize: 20.0 ),
-          ),
-
-          backgroundColor: Colors.lightBlue,
-          elevation: 0.0,
-
-
-        ),
-        body: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(vertical: 20.0,horizontal: 50.0),
-          child: Container(
-            //padding: EdgeInsets.all(32),
-            child: Form(
+    return Scaffold(
+      body: Container(
+        child: ListView(
+          children: <Widget>[
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height / 3.5,
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.lightBlue, Colors.lightBlue],
+                  ),
+                  borderRadius:
+                  BorderRadius.only(bottomLeft: Radius.circular(90))),
               child: Column(
-                //crossAxisAlignment: CrossAxisAlignment.start,
-               // mainAxisAlignment: MainAxisAlignment.center,
-
-
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-
-                  //Text("Passwordless Authentication", style: TextStyle(color: Colors.lightBlue, fontSize: 36, fontWeight: FontWeight.w500),),
-
-                  SizedBox(height: 20.0),
-
-                  Text(
-                      'Enter your phone number',
-                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.normal, fontSize: 15.0),
-                  ),
-
-                  SizedBox(height: 20.0),
-
-                  TextFormField(
-                    decoration: textInputDecoration.copyWith(hintText: 'Moblie number'),
-                    controller: _phoneController,
-                  ),
-
-                  SizedBox(height: 20.0),
-                  RaisedButton(
-                    //width: double.infinity,
-                    color: Colors.lightBlueAccent,
-                    child: Text(
-                        'Sign In',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  Spacer(),
+                  Align(
+                    alignment: Alignment.center,
+                    child: Icon(
+                      Icons.person,
+                      size: 90,
+                      color: Colors.white,
                     ),
-
-                    // padding: EdgeInsets.all(16),
-                    onPressed: () async {
-                      final phone = _phoneController.text.trim();
-
-                     setState(() => loading = true);
-
-                       await _auth.loginUser(phone, context);
-
-                      loading = false;
-
-
-                    },
-
-
                   ),
-
-
+                  Spacer(),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 32, right: 32),
+                      child: Text(
+                        'Moblie   OTP   Login',
+                        style: TextStyle(color: Colors.white, fontSize: 18,fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
                 ],
-
               ),
             ),
-          ),
-        )
+            Container(
+              height: MediaQuery.of(context).size.height / 2,
+              width: MediaQuery.of(context).size.width,
+              padding: EdgeInsets.only(top: 62),
+              child: Column(
+                children: <Widget>[
+                  // Spacer(),
+                  Container(
+                    width: MediaQuery.of(context).size.width / 1.2,
+                    height: 45,
+                    padding:
+                    EdgeInsets.only(top: 4, left: 16, right: 16, bottom: 4),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(50)),
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(color: Colors.black12, blurRadius: 5)
+                        ]),
+                    child: TextField(
+                      //maxLength: 10,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        icon: Icon(
+                          Icons.call,
+                          color: Colors.lightBlue,
+                        ),
+                        hintText: '  phone number',
+                        prefix: Text('+91'),
+
+
+                      ),
+
+                      keyboardType: TextInputType.number,
+                      controller: _controller,
+                    ),
+                  ),
+
+                  SizedBox(
+                    height: 20,
+                  ),
+                  InkWell(
+                    onTap: ()  async {
+
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => EnterOTP(_controller.text)));
+                    },
+                    child: Container(
+                      height: 45,
+                      width: MediaQuery.of(context).size.width / 2.5,
+                      decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.lightBlue,
+                              Colors.lightBlue,
+                            ],
+                          ),
+                          borderRadius: BorderRadius.all(Radius.circular(50))),
+                      child: Center(
+                        child: Text(
+                          'Login'.toUpperCase(),
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Spacer(),
+                ],
+              ),
+            ),
+
+
+          ],
+        ),
+      ),
     );
   }
 }

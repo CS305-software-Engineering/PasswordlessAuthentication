@@ -1,38 +1,24 @@
 
-
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/models/user.dart';
 import 'package:myapp/models/userdata.dart';
-
+import 'package:myapp/screens/authenticate/sign_in.dart';
 import 'package:myapp/screens/home/scanner.dart';
-import 'package:myapp/screens/home/session.dart';
 import 'package:myapp/screens/home/user_form.dart';
 
-import 'package:myapp/services/auth.dart';
-
 import 'package:myapp/services/database.dart';
-
 import 'package:provider/provider.dart';
-import 'package:myapp/models/userdata.dart';
+import 'package:myapp/screens/home/session.dart';
+
 
 class Home extends StatelessWidget {
 
-  final AuthService _auth = AuthService();
+
   @override
 
-  Future<void> Weblogout(String name) async {
-
-    Map<String, String> headers = {"Content-type": "application/x-www-form-urlencoded"};
-      var url = Uri.parse('https://passwdless-auth.herokuapp.com/logout');
-      var response = await http.post(url,headers:headers, body: "username=" + name);
-
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-
-  }
 
 
   Widget build(BuildContext context) {
@@ -49,73 +35,150 @@ class Home extends StatelessWidget {
     return StreamProvider<List<UserData>>.value(
       value: DatabaseService().users,
       child: Scaffold(
-        backgroundColor: Colors.blueGrey,
+        backgroundColor: Colors.white,
         appBar: AppBar(
           title: Text(
-              'HOME',
-            style: TextStyle(color: Colors.white , fontWeight: FontWeight.w600 , fontSize: 15.0),
+            'Home'.toUpperCase(),
+            style: TextStyle(
+                color: Colors.white, fontWeight: FontWeight.bold),
           ),
-
-         automaticallyImplyLeading: false,
+          centerTitle: true,
           backgroundColor: Colors.lightBlue,
           elevation: 0.0,
-          actions:<Widget> [
-
-            FlatButton.icon(
-              icon: Icon(Icons.qr_code_scanner_sharp),
-              label: Text('Web'),
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => Scanner()));
-              },
-            ),
-
-            FlatButton.icon(
-              icon: Icon(Icons.person_outline),
-              label: Text('User'),
-              onPressed: () => _showUserPanel(),
-            ),
-
-
-            FlatButton.icon(
-              icon: Icon(Icons.logout),
-              label: Text('Logout'),
-              onPressed: () async{
-                await _auth.signOut();
-              },
-            ),
-
-
-
-          ],
 
         ),
-       // body: Session() ,
-          body: StreamBuilder<profileData>(
-            stream: DatabaseService(uid: user.uid).ProfileData,
-            builder: (context, snapshot) {
-              profileData ProflieData = snapshot.data;
-              return Builder(builder: (BuildContext context) {
-                return Container(
-                    alignment: Alignment.center,
-                    child: Flex(
-                        direction: Axis.vertical,
-                        mainAxisAlignment: MainAxisAlignment.center,
+
+        drawer: Drawer(
+          child: Row(
+            children: [
+
+              Expanded(
+                child: StreamBuilder<profileData>(
+                  stream: DatabaseService(uid: user.uid).ProfileData,
+                  builder: (context, snapshot) {
+                    profileData ProflieData = snapshot.data;
+                    String Name;
+                    Name = ProflieData.name;
+                    return Container(
+                      color: Colors.white,
+                      child: Column(
                         children: <Widget>[
+                          UserAccountsDrawerHeader(accountName: Text(Name),
+                            //accountEmail: Text("abhishekm977@gmail.com"),
+                            currentAccountPicture: CircleAvatar(
+                              backgroundColor: Colors.orange,
+                              child: Text(
+                                Name[0],
+                                style: TextStyle(fontSize: 40.0),
+                              ),
+                            ),  ),
+                          //Spacer(),
+                         // Divider(),
 
-                          ElevatedButton(
-                              onPressed: () => Weblogout(ProflieData.name),
-                              child: Text('Web Logout')),
+                          ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: Colors.lightBlue,
+                              child: Icon(
+                                Icons.home_outlined,
+                                color: Colors.white,
+                                size: 30.0,
+                              ),
+                            ),
+                            title: Text("Home"),
+                            onTap: () { Navigator.pop(context);  },
+                          ),
+                          Divider(),
 
-                          //Text('Scan result : ',
-                              //style: TextStyle(fontSize: 20))
-                        ]));
-              }
-              );
-            }
-          )
+                          ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor: Colors.lightBlue,
+                                child: Icon(
+                                  Icons.qr_code_scanner_sharp,
+                                  color: Colors.white,
+                                  size: 30.0,
+                                ),
+                              ),
+                              title: Text("Web login Scanner"),
+                              onTap: () {
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => Scanner()));
+                              }
+                          ),
+
+                          Divider(),
+
+                          ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor: Colors.lightBlue,
+                                child: Icon(
+                                  Icons.laptop_chromebook_rounded,
+                                  color: Colors.white,
+                                  size: 30.0,
+                                ),
+                              ),
+                              title: Text("Web Sessions"),
+                              onTap: () {
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => Session()));
+                              }
+                          ),
+
+                          Divider(),
+
+                          ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: Colors.lightBlue,
+                              child: Icon(
+                                Icons.settings,
+                                color: Colors.white,
+                                size: 30.0,
+                              ),
+                            ),
+                            title: Text("Settings"),
+                            onTap: () { _showUserPanel();},
+                          ),
+
+                          Divider(),
+
+                          ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: Colors.lightBlue,
+                              child: Icon(
+                                Icons.exit_to_app,
+                                color: Colors.white,
+                                size: 30.0,
+                              ),
+                            ),
+                            title: Text("Logout"),
+                            onTap: () async{
+                              await FirebaseAuth.instance.signOut();
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => SignIn()),
+                                      (route) => false);
+                              }
+                          ),
+                          Divider(),
+
+
+                          Spacer(),
+
+                        ]
+
+                      ),
+
+
+                    );
+                  }
+                ),
+
+                  ),
+            ],
+          ),
+            ),
+
+
+
       )
     );
-
 
   }
 }

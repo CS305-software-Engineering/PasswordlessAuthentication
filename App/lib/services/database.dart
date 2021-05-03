@@ -15,7 +15,7 @@ class DatabaseService {
 
   Future updateUserData(String name) async {
 
-    return await userCollection.document(uid).setData({
+    return await userCollection.document(uid).updateData({
 
       'name' : name,
 
@@ -29,10 +29,10 @@ class DatabaseService {
     return snapshot.documents.map((doc){
 
       return UserData(
-        name: doc.data['name'] ?? '',
-        login_time: doc.data['Login Time'] ?? '',
-        logout_time: doc.data['Logout Time'] ?? '',
-        status: doc.data['Status'] ?? '',
+        name: doc.data['name'] ?? '-',
+        login_time: doc.data['Login Time'] ?? '-',
+        logout_time: doc.data['Logout Time'] ?? '-',
+        status: doc.data['Status'] ?? '-',
       );
 
     }).toList();
@@ -41,11 +41,12 @@ class DatabaseService {
 
   profileData _profileDataFromSnapshot(DocumentSnapshot snapshot){
     return profileData(
-      uid: uid,
-      name: snapshot.data['name'],
-        login_time: snapshot.data['Login Time'],
-      logout_time: snapshot.data['Logout Time'],
-      status: snapshot.data['Status']
+        uid: uid,
+        name: snapshot.data['name'] ?? '-',
+        login_time: snapshot.data['Login Time'] ?? '-',
+        logout_time: snapshot.data['Logout Time'] ?? '-',
+        status: snapshot.data['Status'] ?? '-',
+        platform: snapshot.data['platform'] ?? '-'
 
     );
   }
@@ -53,12 +54,12 @@ class DatabaseService {
   Stream<List<UserData>> get users{
 
     return userCollection.snapshots()
-     .map(_userListFromSnapshot);
+        .map(_userListFromSnapshot);
 
   }
 
-Stream<profileData> get ProfileData {
+  Stream<profileData> get ProfileData {
     return userCollection.document(uid).snapshots()
         .map(_profileDataFromSnapshot);
-}
+  }
 }

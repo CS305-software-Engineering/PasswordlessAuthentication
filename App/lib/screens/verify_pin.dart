@@ -15,47 +15,55 @@ class PinVerify extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Enter your pin"),
+        centerTitle: true,
       ),
       body: Container(
+        margin: EdgeInsets.all(10),
 
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
+        height: 150,
+        child: ListView(
+        children: <Widget>[
 
-          child: PinEntryTextField(
-            lastPin: app_Pin,
-            showFieldAsBox: true,
-            isTextObscure: true,
-            onSubmit: (String pin) async{
-              final prefs = await SharedPreferences.getInstance();
-              final key = 'password';
-              final value = prefs.getString(key) ?? 'empty';
-              app_Pin=value;
-              if(app_Pin==pin){
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Home()),
-                );
+          Container(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+
+              child: PinEntryTextField(
+                lastPin: app_Pin,
+                showFieldAsBox: true,
+                isTextObscure: true,
+                onSubmit: (String pin) async{
+                  final prefs = await SharedPreferences.getInstance();
+                  final key = 'password';
+                  final value = prefs.getString(key) ?? 'empty';
+                  app_Pin=value;
+                  if(app_Pin==pin){
+                     Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Home()),
+                    );
 
 
                 //return homePage();
 
-              }
-              else {
-                showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: Text("Pin"),
-                        content: Text('Wrong pin entered'),
-                      );
-                    }
-                );//end showDialog()
-              }
+                  }
+                  else {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: Text("Pin"),
+                            content: Text('Wrong pin entered'),
+                          );
+                        }
+                    );//end showDialog()
+                  }
 
             }, // end onSubmit
           ), // end PinEntryTextField()
         ), // end Padding()
-      ), // end Container()
+      ),
+        ],),),// end Container()
     );
   }
 

@@ -23,7 +23,7 @@ class _ScannerState extends State<Scanner> {
   }
 
 
-  Future<void> scanQR(String name) async {
+  Future<void> scanQR(String uid,String name) async {
     String barcodeScanRes;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
@@ -33,7 +33,7 @@ class _ScannerState extends State<Scanner> {
 
 
       var url = Uri.parse('https://passwdless-auth.herokuapp.com/login');
-      var response = await http.post(url, body: {'qr_id': barcodeScanRes ,'username': name});
+      var response = await http.post(url, body: {'qr_id': barcodeScanRes ,'uid':uid,'username': name});
       print('Response status: ${response.statusCode}');
       print('Response body: ${response.body}');
     } on PlatformException {
@@ -63,13 +63,20 @@ class _ScannerState extends State<Scanner> {
         profileData ProflieData = snapshot.data;
         return MaterialApp(
             home: Scaffold(
-                backgroundColor: Colors.blueGrey,
-                appBar: AppBar(title: const Text(
+                backgroundColor: Colors.white,
+                appBar: AppBar(
+                  leading: IconButton(
+                    icon: Icon(Icons.arrow_back, color: Colors.black),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                  title: const Text(
                   'Web Login',
                   style: TextStyle(color: Colors.white , fontWeight: FontWeight.w600 , fontSize: 20.0),
                 ),
                   backgroundColor: Colors.lightBlue,
                   elevation: 0.0,
+                  centerTitle: true,
+                  automaticallyImplyLeading: true,
                 ),
                 body: Builder(builder: (BuildContext context) {
                   return Container(
@@ -79,11 +86,30 @@ class _ScannerState extends State<Scanner> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
 
-                            ElevatedButton(
-                                onPressed: () => scanQR(ProflieData.name),
-                                child: Text('Start QR scan')),
+                            InkWell(
+                              onTap: ()  => scanQR(ProflieData.uid,ProflieData.name),
+                              child: Container(
+                                height: 45,
+                                width: MediaQuery.of(context).size.width / 1.5,
+                                decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.lightBlue,
+                                        Colors.lightBlue,
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.all(Radius.circular(50))),
+                                child: Center(
+                                  child: Text(
+                                    'Scan Your QR code'.toUpperCase(),
+                                    style: TextStyle(
+                                        color: Colors.white, fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                            ),
 
-                            Text('Scan result : $_scanBarcode\n',
+                            Text('Scan result : ${ProflieData.status}\n',
                                 style: TextStyle(fontSize: 20))
                           ]));
                 })));
