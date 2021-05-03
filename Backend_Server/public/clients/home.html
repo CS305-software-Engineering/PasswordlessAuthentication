@@ -24,11 +24,6 @@
     <!-- Custom stylesheet -->
 </head>
 
-<h1>
-    <div>Welcome!!</div>
-</h1>
-<h1 id='user'> </h1>
-<input type="button" value="Log out" onclick="logout()">
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script>
@@ -46,20 +41,16 @@
     setInterval(function () {
         var oReq = new XMLHttpRequest();
 
-        // oReq.open("POST", "http://localhost:3000/logout/check");
+        //oReq.open("POST", "http://localhost:3000/logout/check");
         oReq.open("POST", "https://passwdless-auth.herokuapp.com/logout/check");
-
         oReq.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         oReq.responseType = 'json';
-        oReq.send("username=" + data.username);
-        // oReq.send({ 'username': data.username });
+        oReq.send("username=" + data.userId);
         oReq.onload = function () {
             let body = oReq.response;
-            console.log(body);
-            console.log("##");
-            console.log(body.msg);
+
             if (body.msg == "Logged out") {
-                console.log('inside if');
+
                 //window.location = "http://localhost:3000/clients/index1.html";
                 window.location = "https://passwdless-auth.herokuapp.com/clients/index1.html";
             }
@@ -69,13 +60,55 @@
             }
         }
 
-
-        //window.location = "http://localhost:3000/clients/index1.html";
-    }, 1000);
+    }, 5000);
 </script>
 
 <script>
+    function get_messages() {
+        var data;
+        var parameters = location.search.substring(1).split("&");
+        var temp = parameters[0].split("=");
+        var token = unescape(temp[1]);
+        data = JSON.parse(atob(token.split('.')[1]));
+        console.log('name on browser');
+        console.log(data.userId);
+        var body;
+        var oReq = new XMLHttpRequest();
 
+        //oReq.open("POST", "http://localhost:3000/msg/tok");
+        oReq.open("POST", "https://passwdless-auth.herokuapp.com/msg/tok");
+
+        oReq.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        oReq.responseType = 'json';
+        oReq.send("userId=" + data.userId);
+        oReq.onload = function () {
+
+            body = oReq.response;
+            console.log("##");
+            console.log(body);
+
+            document.getElementById("msglist").innerHTML = " ";
+            //msglist = document.getElementById("msglist");
+            var msgs = "<div>Messages:</div><ul>";
+            function myFunction(value, index, array) {
+                msgs = msgs + "<li>" + value + "</li>";
+                console.log(msgs);
+                console.log("**");
+            }
+            body.forEach(myFunction);
+
+
+            msgs = msgs + "</ul>";
+            console.log(msgs);
+            document.getElementById("msglist").innerHTML = msgs;
+            document.getElementById("msglist").style.visibility = "visible";
+            console.log("***");
+            console.log(body);
+
+
+        }
+
+    }
     function logout() {
         var data;
         var parameters = location.search.substring(1).split("&");
@@ -83,14 +116,13 @@
         var token = unescape(temp[1]);
         data = JSON.parse(atob(token.split('.')[1]));
         console.log('name on browser');
-        console.log(data.username);
+        console.log(data.userId);
         var oReq = new XMLHttpRequest();
 
         //oReq.open("POST", "http://localhost:3000/logout");
         oReq.open("POST", "https://passwdless-auth.herokuapp.com/logout");
         oReq.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        oReq.send("username=" + data.username);
-        // oReq.send({ 'username': data.username });
+        oReq.send("userId=" + data.userId);
         //window.location = "http://localhost:3000/clients/index1.html";
         window.location = "https://passwdless-auth.herokuapp.com/clients/index1.html";
     }
@@ -123,13 +155,21 @@
                                     class="font-size-9 letter-spacing-np4 line-height-1p714 position-relative pr-xl-14 pr-lg-0 pr-md-9 pl-lg-11 pl-9">
                                     <span class="pos-abs-tl px-1 h-50 bg-selago-2"></span>
                                 </p>
+                                <div id="msglist"
+                                    class="col-lg-8 col-md-8 col-sm-10 pr-md-6 pr-sm-0 font-size-9 letter-spacing-np4 line-height-1p714 position-relative pr-xl-14 pr-lg-0 pr-md-9 pl-lg-11 pl-9">
+                                </div>
+
                             </div>
                             <!-- hero area content end -->
                             <!-- btn start -->
                             <div class="col-lg-4 col-md-4 col-sm-6 pl-md-0 pl-sm-12 flex-y-center">
-                                <canvas class="center" id="canvas"></canvas>
+
                             </div>
                             <!-- btn end -->
+                            <div class="col-lg-4 col-md-4 col-sm-6 pl-md-0 pl-sm-12 flex-y-center">
+                                <input id="logout" type="button" value="Log out" onclick="logout()">
+                                <input id="getmsg" type="button" value="Show messages" onclick="get_messages()">
+                            </div>
                         </div>
 
 
