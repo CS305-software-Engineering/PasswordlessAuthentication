@@ -27,13 +27,7 @@
 
 <script>
     window.onload = function () {
-        var x = sessionStorage.getItem("lastname");
-        if (x == "true") {
-
-        }
-        else {
-            initWebSocket();
-        }
+        initWebSocket();
     };
 </script>
 
@@ -41,17 +35,56 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="/qrcode/qrcode.min.js"></script>
 <script>
+    var id;
     var userId = "";
     function initWebSocket() {
         document.getElementById("logout").style.visibility = "hidden";
         document.getElementById("getmsg").style.visibility = "hidden";
         document.getElementById("msglist").style.visibility = "hidden";
-        const socket = new WebSocket('ws://localhost:3000');
-        //const socket = new WebSocket('wss://passwdless-auth.herokuapp.com/');
+        //const socket = new WebSocket('ws://localhost:3000');
+        const socket = new WebSocket('wss://passwdless-auth.herokuapp.com/');
 
         // Connection opened
         socket.addEventListener('open', function (event) {
-            socket.send(JSON.stringify({ message: 'Connected to WS Server' }))
+
+            var sBrowser, sUsrAg = navigator.userAgent;
+            if (sUsrAg.indexOf("Firefox") > -1) {
+                sBrowser = "Mozilla Firefox";
+            } else if (sUsrAg.indexOf("SamsungBrowser") > -1) {
+                sBrowser = "Samsung Internet";
+            } else if (sUsrAg.indexOf("Opera") > -1 || sUsrAg.indexOf("OPR") > -1) {
+                sBrowser = "Opera";
+            } else if (sUsrAg.indexOf("Trident") > -1) {
+                sBrowser = "Microsoft Internet Explorer";
+            } else if (sUsrAg.indexOf("Edge") > -1) {
+                sBrowser = "Microsoft Edge";
+            } else if (sUsrAg.indexOf("Chrome") > -1) {
+                sBrowser = "Google Chrome or Chromium";
+            } else if (sUsrAg.indexOf("Safari") > -1) {
+                sBrowser = "Apple Safari";
+            } else {
+                sBrowser = "unknown";
+            }
+
+            var detectOS = "Unknown OS";
+
+            if (navigator.platform.indexOf("Win") != -1)
+                detectOS = "Windows";
+
+            if (navigator.platform.indexOf("Mac") != -1)
+                detectOS = "MacOS";
+
+            if (navigator.platform.indexOf("Linux") != -1)
+                detectOS = "Linux";
+
+            //alert("You are using: " + sBrowser);
+
+            console.log('**start');
+            console.log(sBrowser);
+            console.log(navigator.platform);
+            console.log(detectOS);
+            console.log("end***");
+            socket.send(JSON.stringify({ message: 'Connected to WS Server', platform: sBrowser + ' (' + detectOS + ')' }))
             console.log('Connected to WS Server')
         });
 
@@ -66,12 +99,42 @@
             //Generate QR code to display in web browser
 
             if (server_msg.message == 'QR generation') {
+                id = server_msg.QR_Id;
                 console.log('QR id:   ' + server_msg.QR_Id);
                 QRCode.toCanvas(document.getElementById('canvas'), server_msg.QR_Id, function (error) {
                     if (error) console.error(error)
                     else { console.log('success!') };
                 });
             }
+
+            if (server_msg.message == 'messages') {
+
+                body = server_msg.msgs;
+                console.log("##");
+                console.log(body);
+
+                document.getElementById("msglist").innerHTML = " ";
+                //msglist = document.getElementById("msglist");
+                var msgs = "<div>Messages:</div><ul>";
+                function myFunction(value, index, array) {
+                    msgs = msgs + "<li>" + value + "</li>";
+                    console.log(msgs);
+                    console.log("**");
+                }
+                body.forEach(myFunction);
+
+
+                msgs = msgs + "</ul>";
+                console.log(msgs);
+                document.getElementById("msglist").innerHTML = msgs;
+                document.getElementById("msglist").style.visibility = "visible";
+            }
+
+            if (server_msg.message == 'logout') {
+                console.log("-------logout message-----")
+                location.reload();
+            }
+
             if (server_msg.Auth == true) {
                 var user = server_msg.username;
                 userId = server_msg.userId;
@@ -80,63 +143,62 @@
                 sessionStorage.setItem("userId", userId);
                 sessionStorage.setItem("Auth", "true");
                 document.getElementById("show_name").innerHTML = "Welcome " + user + ", you are logged in successfully!!!";
+
                 document.getElementById("canvas").style.visibility = "hidden";
-                document.getElementById("scan_title").style.visibility = "hidden";
+                document.getElementById("scan_title").style.display = "none";
                 document.getElementById("logout").style.visibility = "visible";
                 document.getElementById("getmsg").style.visibility = "visible";
-                document.getElementById("web_title").style.visibility = "hidden";
+                document.getElementById("web_title").style.display = "none";
 
             }
-            function logout() {
-                sessionStorage.setItem("Auth", "true");
-                document.getElementById("canvas").style.visibility = "visible";
-            }
-
 
         }
         );
     }
+
     function logout() {
-        sessionStorage.setItem("Auth", "true");
-        document.getElementById("canvas").style.visibility = "visible";
+        var body;
+        var oReq = new XMLHttpRequest();
+        //oReq.open("POST", "http://localhost:3000/logout/ws");
+        oReq.open("POST", "https://passwdless-auth.herokuapp.com/logout/ws");
+
+        oReq.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        oReq.responseType = 'json';
+        oReq.send("userId=" + id);
+        oReq.onload = function () {
+            body = oReq.response;
+            console.log("***");
+            console.log(body);
+
+        }
+
+        location.reload();
     }
     function get_messages() {
         var body;
         var oReq = new XMLHttpRequest();
-        var userId = sessionStorage.getItem("userId");
-        oReq.open("POST", "http://localhost:3000/msg");
-        //oReq.open("GET", "https://passwdless-auth.herokuapp.com/msg");
+        //var userId = sessionStorage.getItem("userId");
+        //oReq.open("POST", "http://localhost:3000/msg");
+        oReq.open("POST", "https://passwdless-auth.herokuapp.com/msg");
 
         oReq.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         oReq.responseType = 'json';
-        oReq.send("userId=" + userId);
+        oReq.send("userId=" + id);
         oReq.onload = function () {
             body = oReq.response;
-            console.log("##");
+            console.log("***");
             console.log(body);
 
-            document.getElementById("msglist").innerHTML = " ";
-            //msglist = document.getElementById("msglist");
-            var msgs = "<div>Messages:</div><ul>";
-            function myFunction(value, index, array) {
-                msgs = msgs + "<li>" + value + "</li>";
-                console.log(msgs);
-                console.log("**");
-            }
-            body.forEach(myFunction);
 
-
-            msgs = msgs + "</ul>";
-            console.log(msgs);
-            document.getElementById("msglist").innerHTML = msgs;
-            document.getElementById("msglist").style.visibility = "visible";
         }
 
     }
+
+
 </script>
-
-
-
+<script>
+    window.addEventListener("beforeunload", logout);
+</script>
 
 
 
@@ -158,31 +220,37 @@
                         <h1
                             class="font-size-18 font-family-1 font-wieght-extra-bold heading-default-color letter-spacing-n3 line-height-1p228 mb-11 ">
                             Auth QR</h1>
-                        <h1 id="web_title"> Web Login</h1>
+                        <h1 id="web_title"
+                            class="font-size-18 font-family-1 font-wieght-extra-bold heading-default-color letter-spacing-n3 line-height-1p228 mb-11 ">
+                            Web Login</h1>
                         <!-- hero area section title end -->
                         <div class="row">
                             <!-- hero area content start -->
-                            <div id="scan_title" class="col-lg-8 col-md-8 col-sm-10 pr-md-6 pr-sm-0">
-                                <p
-                                    class="font-size-9 letter-spacing-np4 line-height-1p714 position-relative pr-xl-14 pr-lg-0 pr-md-9 pl-lg-11 pl-9">
-                                    Scan the following QR code with the AuthQR app on your mobile to login <span
-                                        class="pos-abs-tl px-1 h-50 bg-selago-2"></span> </p>
-                            </div>
+
                             <div class="col-lg-8 col-md-8 col-sm-10 pr-md-6 pr-sm-0">
                                 <p id="show_name"
                                     class="font-size-9 letter-spacing-np4 line-height-1p714 position-relative pr-xl-14 pr-lg-0 pr-md-9 pl-lg-11 pl-9">
                                     <span class="pos-abs-tl px-1 h-50 bg-selago-2"></span>
                                 </p>
-                                <div id="msglist"></div>
+                                <div id="msglist"
+                                    class="col-lg-8 col-md-8 col-sm-10 pr-md-6 pr-sm-0 font-size-9 letter-spacing-np4 line-height-1p714 position-relative pr-xl-14 pr-lg-0 pr-md-9 pl-lg-11 pl-9">
+                                </div>
+                            </div>
+                            <div id="scan_title" class="col-lg-8 col-md-8 col-sm-10 pr-md-6 pr-sm-0 ">
+                                <p
+                                    class="font-size-9 letter-spacing-np4 line-height-1p714 position-relative pr-xl-14 pr-lg-0 pr-md-9 pl-lg-11 pl-9">
+                                    Scan the following QR code with the AuthQR app on your mobile to login <span
+                                        class="pos-abs-tl px-1 h-50 bg-selago-2"></span> </p>
                             </div>
                             <!-- hero area content end -->
                             <!-- btn start -->
-                            <div class="col-lg-4 col-md-4 col-sm-6 pl-md-0 pl-sm-12 flex-y-center">
-                                <canvas class="center" id="canvas"></canvas>
-                                <input id="logout" type="button" value="Log out" onclick="logout()">
-                                <input id="getmsg" type="button" value="Show messages" onclick="get_messages()">
-                            </div>
+
                             <!-- btn end -->
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-6 pl-md-0 pl-sm-12 flex-y-center">
+                            <canvas class="center" id="canvas"></canvas>
+                            <input id="logout" type="button" value="Log out" onclick="logout()">
+                            <input id="getmsg" type="button" value="Show messages" onclick="get_messages()">
                         </div>
 
 

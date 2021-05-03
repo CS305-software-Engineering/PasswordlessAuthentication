@@ -2,7 +2,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('./cors');
 const jwt = require('jsonwebtoken');
-//const db = require('./database.js');
 const auth = require('../auth.js');
 const config = require('../config.js');
 
@@ -25,13 +24,16 @@ loginRouter.route('/')
         var userId = data.userId;
 
         var msg = { 'Auth': true, 'username': userName, message: 'Auth done... Username sent' };
-        //console.log(sockets_connections[qr_id]);
         if (sockets_connections[qr_id] != undefined || sockets_connections[qr_id] != null) {
+            var platform = sockets_connections[qr_id].platform;
 
-            const accessToken = jwt.sign({ 'username': userName, 'Auth': true, message: 'Auth done... Username sent' }, accessTokenSecret, { expiresIn: '20m' });
-            const refreshToken = jwt.sign({ 'username': userName, 'Auth': true, message: 'Auth done... Username sent' }, refreshTokenSecret);
+            const accessToken = jwt.sign({ 'username': userName, 'userId': qr_id, 'Auth': true, message: 'Auth done... Username sent' }, accessTokenSecret, { expiresIn: '20m' });
+            const refreshToken = jwt.sign({ 'username': userName, 'userId': qr_id, 'Auth': true, message: 'Auth done... Username sent' }, refreshTokenSecret);
 
-            refreshTokens[userName] = refreshToken;
+            refreshTokens[qr_id] = refreshToken;
+
+            console.log("refresh token for :  " + qr_id + "   is :------------------------");
+            console.log(refreshTokens[qr_id]);
 
             //date
             let date_ob = new Date();
@@ -45,12 +47,13 @@ loginRouter.route('/')
             var loginDate = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
 
             console.log('username received: ' + userName);
-            //const docRef = db.collection('userInfo').doc('alovelace');
-            await db.collection('userInfo').doc(userName).set({
-                'name': userName,
+            console.log('platform: ' + platform);
+
+            await db.collection('userInfo').doc(userId).update({
                 'Status': 'active',
                 'Login Time': loginDate,
-                'Logout Time': '-'
+                'Logout Time': '-',
+                'platform': platform
             }).then(function (docRef) {
                 console.log('Doc added: ');
             })
@@ -60,11 +63,12 @@ loginRouter.route('/')
 
 
             var msg = { 'Auth': true, 'username': userName, 'userId': userId, 'token': accessToken };
-            //console.log("Before " + Object.size(clients));
+
 
             sockets_connections[qr_id].auth = true;  //new
             sockets_connections[qr_id].userId = userId; //new
             sockets_connections[qr_id].send(JSON.stringify(msg), { mask: false });
+            mapId[qr_id] = userId;
 
             res.status(201).send(msg);
         }
@@ -72,7 +76,7 @@ loginRouter.route('/')
             res.status(400).send('No information is found with requested data');
         }
 
-        //res.status(201).send(JSON.stringify(msg));
+
     });
 
 module.exports = loginRouter;

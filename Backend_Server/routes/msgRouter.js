@@ -21,8 +21,31 @@ msgRouter.route('/')
         var temp = data.userId;
         console.log("userId:  ");
         console.log(temp);
+        var temp1 = mapId[temp];
+        console.log('userId:  ' + temp1);
+        await db.collection('userInfo').doc(temp1).get()
+            .then(function (docRef) {
+                console.log('Message doc received: ');
+                console.log(docRef.data());
+                sockets_connections[temp].send(JSON.stringify({ 'message': "messages", 'msgs': docRef.data().messages }), { mask: false });
+                res.send(docRef.data().messages);
+            })
+            .catch(function (error) {
+                console.error('Error adding document: ' + error);
+                res.send("Error receiving messages");
+            });
 
-        await db.collection('userInfo').doc(temp).get()
+    });
+
+msgRouter.route('/tok')
+    .post(async (req, res) => {
+        const data = req.body;
+        console.log('name and refreshTokens check:  ');
+        var temp = data.userId.toString();
+        console.log(temp);
+        var temp1 = mapId[temp];
+        console.log('userId:  ' + temp1);
+        await db.collection('userInfo').doc(temp1).get()
             .then(function (docRef) {
                 console.log('Message doc received: ');
                 console.log(docRef.data());

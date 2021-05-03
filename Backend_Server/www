@@ -87,6 +87,7 @@ server.on('listening', onListening);
 //global variables
 global.sockets_connections = {};
 global.refreshTokens = {};
+global.mapId = {};
 
 //WebSocket code
 
@@ -112,15 +113,14 @@ wss.on('connection', function connection(ws) {
       }
 
       sockets_connections[qr_id] = ws;
-      sockets_connections[qr_id].auth = false;  //new
+      sockets_connections[qr_id].auth = false;
+      sockets_connections[qr_id].platform = client_msg.platform;
       //sending the qr_id to the web browser to generate a QR Code
       ws.send(JSON.stringify(server_msg));
     }
 
 
   });
-
-
 
 });
 
