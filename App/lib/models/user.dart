@@ -17,6 +17,7 @@ class profileData {
   final String logout_time;
   final String status;
   final String platform;
+  final String messages;
 
-  profileData({this.uid,this.name,this.login_time,this.logout_time,this.status,this.platform});
+  profileData({this.uid,this.name,this.login_time,this.logout_time,this.status,this.platform,this.messages});
 }

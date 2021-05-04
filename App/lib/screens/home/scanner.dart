@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,6 +8,8 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:myapp/models/user.dart';
 import 'package:myapp/services/database.dart';
 import 'package:provider/provider.dart';
+
+var useruid ;
 
 
 
@@ -16,10 +20,51 @@ class Scanner extends StatefulWidget {
 
 class _ScannerState extends State<Scanner> {
   String _scanBarcode = 'Unknown';
+  final FirebaseMessaging _fcm = FirebaseMessaging();
 
   @override
-  void initState() {
-    super.initState();
+  void notification() async{
+
+
+
+    _fcm.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        print("onMessage: $message");
+        final snackbar = SnackBar(
+          content: Text(message['notification']['title']),
+          action: SnackBarAction(
+            label: 'Go',
+            onPressed: () => null,
+          ),
+        );
+
+        Scaffold.of(context).showSnackBar(snackbar);
+
+              AlertDialog(
+
+                content: ListTile(
+                  title: Text(message['notification']['title']),
+                  subtitle: Text(message['notification']['body']),
+                ),
+                actions: <Widget>[
+                  FlatButton(
+                    color: Colors.amber,
+                    child: Text('Ok'),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              );
+
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        print("onLaunch: $message");
+        // TODO optional
+      },
+      onResume: (Map<String, dynamic> message) async {
+        print("onResume: $message");
+        // TODO optional
+      },
+    );
   }
 
 
@@ -33,7 +78,7 @@ class _ScannerState extends State<Scanner> {
 
 
       var url = Uri.parse('https://passwdless-auth.herokuapp.com/login');
-      var response = await http.post(url, body: {'qr_id': barcodeScanRes ,'uid':uid,'username': name});
+      var response = await http.post(url, body: {'qr_id': barcodeScanRes ,'userId':uid,'username': name});
       print('Response status: ${response.statusCode}');
       print('Response body: ${response.body}');
     } on PlatformException {
@@ -56,10 +101,13 @@ class _ScannerState extends State<Scanner> {
   Widget build(BuildContext context) {
 
     final user = Provider.of<User>(context);
+    notification();
+
 
     return StreamBuilder<profileData>(
       stream: DatabaseService(uid: user.uid).ProfileData,
       builder: (context, snapshot) {
+        if(snapshot.data == null) return CircularProgressIndicator();
         profileData ProflieData = snapshot.data;
         return MaterialApp(
             home: Scaffold(
@@ -116,4 +164,9 @@ class _ScannerState extends State<Scanner> {
       }
     );
   }
+
+
+
+
+
 }

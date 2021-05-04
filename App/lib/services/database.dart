@@ -25,6 +25,7 @@ class DatabaseService {
 
   }
 
+
   List<UserData> _userListFromSnapshot(QuerySnapshot snapshot){
     return snapshot.documents.map((doc){
 
@@ -41,12 +42,13 @@ class DatabaseService {
 
   profileData _profileDataFromSnapshot(DocumentSnapshot snapshot){
     return profileData(
-        uid: uid,
+        uid: uid ,
         name: snapshot.data['name'] ?? '-',
         login_time: snapshot.data['Login Time'] ?? '-',
         logout_time: snapshot.data['Logout Time'] ?? '-',
         status: snapshot.data['Status'] ?? '-',
-        platform: snapshot.data['platform'] ?? '-'
+        platform: snapshot.data['platform'] ?? '-',
+        messages : snapshot.data['messages'] ?? '-'
 
     );
   }
